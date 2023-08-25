@@ -16,10 +16,19 @@ Sentry.init({ dsn: process.env.SENTRY_DSN });
 
 const app = express();
 
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://127.0.0.1:3000'];
+
 app.use(
   cors({
     credentials: true,
-    origin: process.env.FRONTEND_URL
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },  // Utiliza un arreglo de orígenes permitidos
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE'
   })
 );
 app.use(cookieParser());
